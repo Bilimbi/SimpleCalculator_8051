@@ -1,0 +1,58 @@
+     1  0000: 02 01 00      LJMP START
+     2  0100:               ORG 100H ; Jump over debuger to the start of the program
+     3  0100:           START:
+     4  0100: 12 81 0C      LCALL LCD_CLR
+     5  0103: 75 81 60  	MOV SP,#60H ; Set stack adress to the 60H
+     6                  
+     7                      ; Get the first number
+     8  0106: 12 81 1C      LCALL WAIT_KEY
+     9  0109: C0 E0         PUSH ACC ; Store the first number on the stack
+    10  010B: 12 81 04      LCALL WRITE_HEX
+    11                  
+    12                      ; Get the operation
+    13  010E: 12 81 1C      LCALL WAIT_KEY
+    14  0111: B4 0A 02      CJNE A, #10, CHECK_SUB
+    15  0114: 80 0F         SJMP ADD_FUNC
+    16                  
+    17  0116:           CHECK_SUB:
+    18  0116: B4 0B 02      CJNE A, #11, CHECK_MUL
+    19  0119: 80 23         SJMP SUB_FUNC
+    20                  
+    21  011B:           CHECK_MUL:
+    22  011B: B4 0C 02      CJNE A, #12, CHECK_DIV
+    23  011E: 80 20         SJMP MUL_FUNC
+    24                      
+    25  0120:           CHECK_DIV:
+    26  0120: B4 0D 21      CJNE A, #13, STOP
+    27  0123: 80 1D         SJMP DIV_FUNC
+    28                  
+    29                  ; \/ Operations \/ ---------------------------
+    30                  
+    31  0125:           ADD_FUNC: ; Addition Function "A"
+    32  0125: 74 2B         MOV A, #'+'
+    33  0127: 12 81 02      LCALL WRITE_DATA
+    34                  
+    35  012A: 12 81 1C      LCALL WAIT_KEY
+    36  012D: F8            MOV R0, A ; Store the second number in R0
+    37  012E: 12 81 04      LCALL WRITE_HEX ; Display the second number
+    38                  
+    39  0131: 74 3D         MOV A, #'='
+    40  0133: 12 81 02      LCALL WRITE_DATA
+    41                  
+    42  0136: D0 E0         POP ACC ; Get the first number from the stack
+    43  0138: 28            ADD A, R0 ; Add the two numbers
+    44  0139: 12 81 04      LCALL WRITE_HEX
+    45                      
+    46  013C: 80 06         SJMP STOP ; Jump to the end of the program
+    47                      
+    48  013E:           SUB_FUNC: ; Substraction Function "B"
+    49  013E: 80 04         SJMP STOP
+    50                  
+    51  0140:           MUL_FUNC: ; Multiplication Function "C"
+    52  0140: 80 02         SJMP STOP
+    53                  
+    54  0142:           DIV_FUNC: ; Division Function "D"
+    55  0142: 80 00         SJMP STOP
+    56                  
+    57  0144:           STOP:
+    58  0144: 80 FE         SJMP $ ; Stopping the program

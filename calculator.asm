@@ -11,16 +11,48 @@ START:
 
     ; Get the operation
     LCALL WAIT_KEY
+    CJNE A, #10, CHECK_SUB
+    SJMP ADD_FUNC
+
+CHECK_SUB:
+    CJNE A, #11, CHECK_MUL
+    SJMP SUB_FUNC
+
+CHECK_MUL:
+    CJNE A, #12, CHECK_DIV
+    SJMP MUL_FUNC
+    
+CHECK_DIV:
+    CJNE A, #13, STOP
+    SJMP DIV_FUNC
 
 ; \/ Operations \/ ---------------------------
 
-ADD_FUNC: ; Addition Function 
+ADD_FUNC: ; Addition Function "A"
+    MOV A, #'+'
+    LCALL WRITE_DATA
 
-SUB_FUNC: ; Substraction Function
+    LCALL WAIT_KEY
+    MOV R0, A ; Store the second number in R0
+    LCALL WRITE_HEX ; Display the second number
 
-MUL_FUNC: ; Multiplication Function
+    MOV A, #'='
+    LCALL WRITE_DATA
 
-DIV_FUNC: ; Division Function
+    POP ACC ; Get the first number from the stack
+    ADD A, R0 ; Add the two numbers
+    LCALL WRITE_HEX
+    
+    SJMP STOP ; Jump to the end of the program
+    
+SUB_FUNC: ; Substraction Function "B"
+    SJMP STOP
+
+MUL_FUNC: ; Multiplication Function "C"
+    SJMP STOP
+
+DIV_FUNC: ; Division Function "D"
+    SJMP STOP
 
 STOP:
     SJMP $ ; Stopping the program
