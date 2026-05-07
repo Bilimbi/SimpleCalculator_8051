@@ -1,13 +1,21 @@
     LJMP START
     ORG 100H ; Jump over debuger to the start of the program
 START:
-    LCALL LCD_CLR
+    LCALL LCD_INIT
+
+MAIN_LOOP:
 	MOV SP,#60H ; Set stack adress to the 60H
 
-    ; Get the first number
-    LCALL WAIT_KEY
-    PUSH ACC ; Store the first number on the stack
-    LCALL WRITE_HEX
+    LCALL LCD_CLR
+
+    MOV R0, #30H ; Point R0 to the first number storage location
+    LCALL GET_NUM ; Get the first number (stored in R0)
+    MOV R0, #30H 
+    LCALL BCD_HEX ; Convert the first number to hex
+
+    ; Store the first number on the stack
+    PUSH 31H ; [STACK] <- First num high byte
+    PUSH 30H ; [STACK] <- First num low byte
 
     ; Get the operation
     LCALL WAIT_KEY
@@ -23,27 +31,56 @@ CHECK_MUL:
     SJMP MUL_FUNC
     
 CHECK_DIV:
-    CJNE A, #13, STOP
+    CJNE A, #13, WRONG_OP
     SJMP DIV_FUNC
 
-; \/ Operations \/ ---------------------------
+; --------------------------------------------------
+; \/ Operations \/
+; --------------------------------------------------
 
 ADD_FUNC: ; Addition Function "A"
     MOV A, #'+'
     LCALL WRITE_DATA
 
-    LCALL WAIT_KEY
-    MOV R0, A ; Store the second number in R0
-    LCALL WRITE_HEX ; Display the second number
+    MOV R0, #30H 
+    LCALL GET_NUM ; Get the second number   
+    MOV R0, #30H
+    LCALL BCD_HEX
 
     MOV A, #'='
     LCALL WRITE_DATA
 
-    POP ACC ; Get the first number from the stack
-    ADD A, R0 ; Add the two numbers
-    LCALL WRITE_HEX
+    POP 33H ; First num low byte <- [STACK]
+    POP 32H ; First num high byte <- [STACK]
+
+; --------------------------------------------------
+; First number popped into 33H=LOW, 32H=HIGH
+; Second number is currently in 30H=LOW, 31H=HIGH
+; --------------------------------------------------
+
+    ; Add the low bytes  
+    MOV A, 30H           
+    ADD A, 33H       
+    MOV 30H, A 
+
+    ; Add the high bytes with carry from the low byte addition
+    MOV A, 31H   
+    ADDC A, 32H       
+    MOV 31H, A  
+
+    ; Convert the result back to BCD
+    MOV R0, #30H        
+    LCALL HEX_BCD        
     
-    SJMP STOP ; Jump to the end of the program
+    ; Display the result 
+    MOV A, 32H
+    LCALL WRITE_HEX
+    MOV A, 31H
+    LCALL WRITE_HEX      
+    MOV A, 30H
+    LCALL WRITE_HEX
+
+    SJMP STOP
     
 SUB_FUNC: ; Substraction Function "B"
     SJMP STOP
@@ -53,6 +90,9 @@ MUL_FUNC: ; Multiplication Function "C"
 
 DIV_FUNC: ; Division Function "D"
     SJMP STOP
+
+WRONG_OP: ; Wrong operation key
+    LJMP MAIN_LOOP
 
 STOP:
     SJMP $ ; Stopping the program
