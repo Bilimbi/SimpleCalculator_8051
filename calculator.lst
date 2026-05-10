@@ -19,80 +19,121 @@
     19                  
     20                      ; Get the operation
     21  0117: 12 81 1C      LCALL WAIT_KEY
-    22  011A: B4 0A 02      CJNE A, #10, CHECK_SUB
-    23  011D: 80 0F         SJMP ADD_FUNC
+    22  011A: B4 0A 03      CJNE A, #10, CHECK_SUB
+    23  011D: 02 01 35      LJMP ADD_FUNC
     24                  
-    25  011F:           CHECK_SUB:
-    26  011F: B4 0B 02      CJNE A, #11, CHECK_MUL
-    27  0122: 80 44         SJMP SUB_FUNC
+    25  0120:           CHECK_SUB:
+    26  0120: B4 0B 03      CJNE A, #11, CHECK_MUL
+    27  0123: 02 01 70      LJMP SUB_FUNC
     28                  
-    29  0124:           CHECK_MUL:
-    30  0124: B4 0C 02      CJNE A, #12, CHECK_DIV
-    31  0127: 80 41         SJMP MUL_FUNC
+    29  0126:           CHECK_MUL:
+    30  0126: B4 0C 03      CJNE A, #12, CHECK_DIV
+    31  0129: 02 01 73      LJMP MUL_FUNC
     32                      
-    33  0129:           CHECK_DIV:
-    34  0129: B4 0D 42      CJNE A, #13, WRONG_OP
-    35  012C: 80 3E         SJMP DIV_FUNC
-    36                  
-    37                  ; --------------------------------------------------
-    38                  ; \/ Operations \/
+    33  012C:           CHECK_DIV:
+    34  012C: B4 0D 03      CJNE A, #13, CHECK_DIV_NOT
+    35  012F: 02 01 B6      LJMP DIV_FUNC
+    36  0132:           CHECK_DIV_NOT:
+    37  0132: 02 01 B9      LJMP WRONG_OP
+    38                  
     39                  ; --------------------------------------------------
-    40                  
-    41  012E:           ADD_FUNC: ; Addition Function "A"
-    42  012E: 74 2B         MOV A, #'+'
-    43  0130: 12 81 02      LCALL WRITE_DATA
-    44                  
-    45  0133: 78 30         MOV R0, #30H 
-    46  0135: 12 81 1E      LCALL GET_NUM ; Get the second number   
-    47  0138: 78 30         MOV R0, #30H
-    48  013A: 12 81 20      LCALL BCD_HEX
-    49                  
-    50  013D: 74 3D         MOV A, #'='
-    51  013F: 12 81 02      LCALL WRITE_DATA
-    52                  
-    53  0142: D0 33         POP 33H ; First num low byte <- [STACK]
-    54  0144: D0 32         POP 32H ; First num high byte <- [STACK]
-    55                  
-    56                  ; --------------------------------------------------
-    57                  ; First number popped into 33H=LOW, 32H=HIGH
-    58                  ; Second number is currently in 30H=LOW, 31H=HIGH
-    59                  ; --------------------------------------------------
-    60                  
-    61                      ; Add the low bytes  
-    62  0146: E5 30         MOV A, 30H           
-    63  0148: 25 33         ADD A, 33H       
-    64  014A: F5 30         MOV 30H, A 
-    65                  
-    66                      ; Add the high bytes with carry from the low byte addition
-    67  014C: E5 31         MOV A, 31H   
-    68  014E: 35 32         ADDC A, 32H       
-    69  0150: F5 31         MOV 31H, A  
-    70                  
-    71                      ; Convert the result back to BCD
-    72  0152: 78 30         MOV R0, #30H        
-    73  0154: 12 81 22      LCALL HEX_BCD        
-    74                      
-    75                      ; Display the result 
-    76  0157: E5 32         MOV A, 32H
-    77  0159: 12 81 04      LCALL WRITE_HEX
-    78  015C: E5 31         MOV A, 31H
-    79  015E: 12 81 04      LCALL WRITE_HEX      
-    80  0161: E5 30         MOV A, 30H
-    81  0163: 12 81 04      LCALL WRITE_HEX
-    82                  
-    83  0166: 80 09         SJMP STOP
-    84                      
-    85  0168:           SUB_FUNC: ; Substraction Function "B"
-    86  0168: 80 07         SJMP STOP
-    87                  
-    88  016A:           MUL_FUNC: ; Multiplication Function "C"
-    89  016A: 80 05         SJMP STOP
-    90                  
-    91  016C:           DIV_FUNC: ; Division Function "D"
-    92  016C: 80 03         SJMP STOP
+    40                  ; \/ Operations \/
+    41                  ; --------------------------------------------------
+    42                  
+    43  0135:           ADD_FUNC: ; Addition Function "A"
+    44  0135: 74 2B         MOV A, #'+'
+    45  0137: 12 81 02      LCALL WRITE_DATA
+    46                  
+    47  013A: 78 30         MOV R0, #30H 
+    48  013C: 12 81 1E      LCALL GET_NUM ; Get the second number   
+    49  013F: 78 30         MOV R0, #30H
+    50  0141: 12 81 20      LCALL BCD_HEX
+    51                  
+    52  0144: 74 3D         MOV A, #'='
+    53  0146: 12 81 02      LCALL WRITE_DATA
+    54                  
+    55  0149: D0 33         POP 33H ; First num low byte <- [STACK]
+    56  014B: D0 32         POP 32H ; First num high byte <- [STACK]
+    57                  
+    58                      ; ----------------------------------------------
+    59                      ; First number popped into 33H=LOW, 32H=HIGH
+    60                      ; Second number is currently in 30H=LOW, 31H=HIGH
+    61                      ; ----------------------------------------------
+    62                  
+    63                      ; Add the low bytes  
+    64  014D: E5 30         MOV A, 30H           
+    65  014F: 25 33         ADD A, 33H       
+    66  0151: F5 30         MOV 30H, A 
+    67                  
+    68                      ; Add the high bytes with carry from the low byte addition
+    69  0153: E5 31         MOV A, 31H   
+    70  0155: 35 32         ADDC A, 32H       
+    71  0157: F5 31         MOV 31H, A  
+    72                  
+    73                      ; Convert the result back to BCD
+    74  0159: 78 30         MOV R0, #30H        
+    75  015B: 12 81 22      LCALL HEX_BCD        
+    76                      
+    77                      ; Display the result 
+    78  015E: E5 32         MOV A, 32H ; Highest byte (carry)
+    79  0160: 12 81 04      LCALL WRITE_HEX
+    80  0163: E5 31         MOV A, 31H ; High byte
+    81  0165: 12 81 04      LCALL WRITE_HEX      
+    82  0168: E5 30         MOV A, 30H ; Low byte
+    83  016A: 12 81 04      LCALL WRITE_HEX
+    84                  
+    85  016D: 02 01 BC      LJMP STOP
+    86                      
+    87  0170:           SUB_FUNC: ; Substraction Function "B"
+    88  0170: 02 01 BC      LJMP STOP
+    89                  
+    90  0173:           MUL_FUNC: ; Multiplication Function "C"
+    91  0173: 74 2A         MOV A, #'*'
+    92  0175: 12 81 02      LCALL WRITE_DATA
     93                  
-    94  016E:           WRONG_OP: ; Wrong operation key
-    95  016E: 02 01 03      LJMP MAIN_LOOP
-    96                  
-    97  0171:           STOP:
-    98  0171: 80 FE         SJMP $ ; Stopping the program
+    94  0178: 78 30         MOV R0, #30H 
+    95  017A: 12 81 1E      LCALL GET_NUM ; Get the second number   
+    96  017D: 78 30         MOV R0, #30H
+    97  017F: 12 81 20      LCALL BCD_HEX
+    98                  
+    99  0182: 74 3D         MOV A, #'='
+   100  0184: 12 81 02      LCALL WRITE_DATA
+   101                  
+   102  0187: D0 33         POP 33H ; First num low byte <- [STACK]
+   103  0189: D0 32         POP 32H ; First num high byte <- [STACK]
+   104                  
+   105                      ; ----------------------------------------------
+   106                      ; Multiplicand = @R0 (30H=LOW,31H=HIGH), 
+   107                      ; Multiplier = B,A (B=HIGH,A=LOW)
+   108                      ; ----------------------------------------------
+   109                  
+   110  018B: E5 33         MOV A, 33H
+   111  018D: 85 32 F0      MOV B, 32H
+   112  0190: 78 30         MOV R0, #30H
+   113  0192: 12 81 24      LCALL MUL_2_2
+   114                  
+   115  0195: 78 30         MOV R0, #30H
+   116  0197: 12 81 22      LCALL HEX_BCD
+   117  019A: 78 32         MOV R0, #32H
+   118  019C: 12 81 22      LCALL HEX_BCD
+   119                  
+   120                      ; Result is 4 bytes at 30H - 33H
+   121  019F: E5 33         MOV A, 33H
+   122  01A1: 12 81 04      LCALL WRITE_HEX
+   123  01A4: E5 32         MOV A, 32H
+   124  01A6: 12 81 04      LCALL WRITE_HEX
+   125  01A9: E5 31         MOV A, 31H
+   126  01AB: 12 81 04      LCALL WRITE_HEX
+   127  01AE: E5 30         MOV A, 30H
+   128  01B0: 12 81 04      LCALL WRITE_HEX
+   129                  
+   130  01B3: 02 01 BC      LJMP STOP
+   131                  
+   132  01B6:           DIV_FUNC: ; Division Function "D"
+   133  01B6: 02 01 BC      LJMP STOP
+   134                  
+   135  01B9:           WRONG_OP: ; Wrong operation key
+   136  01B9: 02 01 03      LJMP MAIN_LOOP
+   137                  
+   138  01BC:           STOP:
+   139  01BC: 80 FE         SJMP $ ; Stopping the program

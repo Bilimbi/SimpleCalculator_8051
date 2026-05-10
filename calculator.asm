@@ -20,19 +20,21 @@ MAIN_LOOP:
     ; Get the operation
     LCALL WAIT_KEY
     CJNE A, #10, CHECK_SUB
-    SJMP ADD_FUNC
+    LJMP ADD_FUNC
 
 CHECK_SUB:
     CJNE A, #11, CHECK_MUL
-    SJMP SUB_FUNC
+    LJMP SUB_FUNC
 
 CHECK_MUL:
     CJNE A, #12, CHECK_DIV
-    SJMP MUL_FUNC
+    LJMP MUL_FUNC
     
 CHECK_DIV:
-    CJNE A, #13, WRONG_OP
-    SJMP DIV_FUNC
+    CJNE A, #13, CHECK_DIV_NOT
+    LJMP DIV_FUNC
+CHECK_DIV_NOT:
+    LJMP WRONG_OP
 
 ; --------------------------------------------------
 ; \/ Operations \/
@@ -53,10 +55,10 @@ ADD_FUNC: ; Addition Function "A"
     POP 33H ; First num low byte <- [STACK]
     POP 32H ; First num high byte <- [STACK]
 
-; --------------------------------------------------
-; First number popped into 33H=LOW, 32H=HIGH
-; Second number is currently in 30H=LOW, 31H=HIGH
-; --------------------------------------------------
+    ; ----------------------------------------------
+    ; First number popped into 33H=LOW, 32H=HIGH
+    ; Second number is currently in 30H=LOW, 31H=HIGH
+    ; ----------------------------------------------
 
     ; Add the low bytes  
     MOV A, 30H           
@@ -73,23 +75,60 @@ ADD_FUNC: ; Addition Function "A"
     LCALL HEX_BCD        
     
     ; Display the result 
+    MOV A, 32H ; Highest byte (carry)
+    LCALL WRITE_HEX
+    MOV A, 31H ; High byte
+    LCALL WRITE_HEX      
+    MOV A, 30H ; Low byte
+    LCALL WRITE_HEX
+
+    LJMP STOP
+    
+SUB_FUNC: ; Substraction Function "B"
+    LJMP STOP
+
+MUL_FUNC: ; Multiplication Function "C"
+    MOV A, #'*'
+    LCALL WRITE_DATA
+
+    MOV R0, #30H 
+    LCALL GET_NUM ; Get the second number   
+    MOV R0, #30H
+    LCALL BCD_HEX
+
+    MOV A, #'='
+    LCALL WRITE_DATA
+
+    POP 33H ; First num low byte <- [STACK]
+    POP 32H ; First num high byte <- [STACK]
+
+    ; ----------------------------------------------
+    ; Multiplicand = @R0 (30H=LOW,31H=HIGH), 
+    ; Multiplier = B,A (B=HIGH,A=LOW)
+    ; ----------------------------------------------
+
+    MOV A, 33H
+    MOV B, 32H
+    MOV R0, #30H
+    LCALL MUL_2_2
+
+    MOV R0, #30H
+    LCALL HEX_BCD
+
+    ; Result is 4 bytes at 30H - 33H
+    MOV A, 33H
+    LCALL WRITE_HEX
     MOV A, 32H
     LCALL WRITE_HEX
     MOV A, 31H
-    LCALL WRITE_HEX      
+    LCALL WRITE_HEX
     MOV A, 30H
     LCALL WRITE_HEX
 
-    SJMP STOP
-    
-SUB_FUNC: ; Substraction Function "B"
-    SJMP STOP
-
-MUL_FUNC: ; Multiplication Function "C"
-    SJMP STOP
+    LJMP STOP
 
 DIV_FUNC: ; Division Function "D"
-    SJMP STOP
+    LJMP STOP
 
 WRONG_OP: ; Wrong operation key
     LJMP MAIN_LOOP
