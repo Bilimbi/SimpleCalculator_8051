@@ -82,7 +82,7 @@ ADD_FUNC: ; Addition Function "A"
     MOV A, 30H ; Low byte
     LCALL WRITE_HEX
 
-    LJMP STOP
+    LJMP NEXT_OP
     
 SUB_FUNC: ; Substraction Function "B"
     LJMP STOP
@@ -122,12 +122,16 @@ MUL_FUNC: ; Multiplication Function "C"
     MOV A, 30H
     LCALL WRITE_HEX
 
-    LJMP STOP
+    LJMP NEXT_OP
 
 DIV_FUNC: ; Division Function "D"
     LJMP STOP
 
 WRONG_OP: ; Wrong operation key
+    LJMP MAIN_LOOP
+
+NEXT_OP:
+    LCALL WAIT_ENT_ESC ; Wait for the user to press "Enter" or "Escape"
     LJMP MAIN_LOOP
 
 STOP:

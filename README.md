@@ -6,4 +6,5 @@ This calculator can add, subtract, multiply and divide 4-digit decimal numbers. 
  - Write the first number with 4 digits and leading zeroes, then press enter ("E"). Examples: 0001, 0067, 0394, 6793.
  - Choose the desired operation by pressing: "A" for addition, "B" for subtraction, "C" for multiplication and "D" for division. (You don't need to press enter here).
  - Write the second number like before, with 4 digits and leading zeroes, then press enter ("E").
- - You'll get a result looking like this: 0697+0532=001229
+ - You'll get a result looking like this: 0697+0532=001229.
+ - After getting the result, press enter ("E") to reset the screen and start another calculation.
