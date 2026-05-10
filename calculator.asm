@@ -112,10 +112,7 @@ MUL_FUNC: ; Multiplication Function "C"
     MOV R0, #30H
     LCALL MUL_2_2
 
-    MOV R0, #30H
-    LCALL HEX_BCD
-
-    ; Result is 4 bytes at 30H - 33H
+    ; Result (in hexadecimal) is 4 bytes at 30H - 33H
     MOV A, 33H
     LCALL WRITE_HEX
     MOV A, 32H

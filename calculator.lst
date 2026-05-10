@@ -32,9 +32,9 @@
     32                      
     33  012C:           CHECK_DIV:
     34  012C: B4 0D 03      CJNE A, #13, CHECK_DIV_NOT
-    35  012F: 02 01 B6      LJMP DIV_FUNC
+    35  012F: 02 01 AC      LJMP DIV_FUNC
     36  0132:           CHECK_DIV_NOT:
-    37  0132: 02 01 B9      LJMP WRONG_OP
+    37  0132: 02 01 AF      LJMP WRONG_OP
     38                  
     39                  ; --------------------------------------------------
     40                  ; \/ Operations \/
@@ -82,10 +82,10 @@
     82  0168: E5 30         MOV A, 30H ; Low byte
     83  016A: 12 81 04      LCALL WRITE_HEX
     84                  
-    85  016D: 02 01 BC      LJMP STOP
+    85  016D: 02 01 B2      LJMP STOP
     86                      
     87  0170:           SUB_FUNC: ; Substraction Function "B"
-    88  0170: 02 01 BC      LJMP STOP
+    88  0170: 02 01 B2      LJMP STOP
     89                  
     90  0173:           MUL_FUNC: ; Multiplication Function "C"
     91  0173: 74 2A         MOV A, #'*'
@@ -112,28 +112,23 @@
    112  0190: 78 30         MOV R0, #30H
    113  0192: 12 81 24      LCALL MUL_2_2
    114                  
-   115  0195: 78 30         MOV R0, #30H
-   116  0197: 12 81 22      LCALL HEX_BCD
-   117  019A: 78 32         MOV R0, #32H
-   118  019C: 12 81 22      LCALL HEX_BCD
-   119                  
-   120                      ; Result is 4 bytes at 30H - 33H
-   121  019F: E5 33         MOV A, 33H
-   122  01A1: 12 81 04      LCALL WRITE_HEX
-   123  01A4: E5 32         MOV A, 32H
-   124  01A6: 12 81 04      LCALL WRITE_HEX
-   125  01A9: E5 31         MOV A, 31H
-   126  01AB: 12 81 04      LCALL WRITE_HEX
-   127  01AE: E5 30         MOV A, 30H
-   128  01B0: 12 81 04      LCALL WRITE_HEX
+   115                      ; Result (in hexadecimal) is 4 bytes at 30H - 33H
+   116  0195: E5 33         MOV A, 33H
+   117  0197: 12 81 04      LCALL WRITE_HEX
+   118  019A: E5 32         MOV A, 32H
+   119  019C: 12 81 04      LCALL WRITE_HEX
+   120  019F: E5 31         MOV A, 31H
+   121  01A1: 12 81 04      LCALL WRITE_HEX
+   122  01A4: E5 30         MOV A, 30H
+   123  01A6: 12 81 04      LCALL WRITE_HEX
+   124                  
+   125  01A9: 02 01 B2      LJMP STOP
+   126                  
+   127  01AC:           DIV_FUNC: ; Division Function "D"
+   128  01AC: 02 01 B2      LJMP STOP
    129                  
-   130  01B3: 02 01 BC      LJMP STOP
-   131                  
-   132  01B6:           DIV_FUNC: ; Division Function "D"
-   133  01B6: 02 01 BC      LJMP STOP
-   134                  
-   135  01B9:           WRONG_OP: ; Wrong operation key
-   136  01B9: 02 01 03      LJMP MAIN_LOOP
-   137                  
-   138  01BC:           STOP:
-   139  01BC: 80 FE         SJMP $ ; Stopping the program
+   130  01AF:           WRONG_OP: ; Wrong operation key
+   131  01AF: 02 01 03      LJMP MAIN_LOOP
+   132                  
+   133  01B2:           STOP:
+   134  01B2: 80 FE         SJMP $ ; Stopping the program
