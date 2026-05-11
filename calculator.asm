@@ -125,7 +125,66 @@ MUL_FUNC: ; Multiplication Function "C"
     LJMP NEXT_OP
 
 DIV_FUNC: ; Division Function "D"
-    LJMP STOP
+    MOV A, #'/'
+    LCALL WRITE_DATA
+
+    MOV R0, #36H 
+    LCALL GET_NUM ; Get the second number   
+    MOV R0, #36H
+    LCALL BCD_HEX
+
+    MOV A, #'='
+    LCALL WRITE_DATA
+
+    POP 35H ; First num low byte <- [STACK]
+    POP 34H ; First num high byte <- [STACK]
+
+    ; ----------------------------------------------
+    ; Dividend = @R0 (36H=HIGHEST,37H=LOWEST),
+    ; Divisor = B,A (B=HIGH,A=LOW)
+    ; ----------------------------------------------
+
+    MOV A, 36H ; Divisor low byte
+    MOV B, 37H ; Divisor high byte
+
+    MOV 30H, 35H ; Dividend low byte
+    MOV 31H, 34H ; Dividend high byte
+    ; Zero 2 higher bytes \/
+    MOV 32H, #00H 
+    MOV 33H, #00H
+
+    MOV R0, #30H
+    LCALL DIV_4_2
+
+    ; Convert the result back to BCD
+    MOV R0, #30H        
+    LCALL HEX_BCD ; Quotient
+    MOV R0, #34H
+    LCALL HEX_BCD ; Remainder
+    MOV R0, #36H
+    LCALL HEX_BCD ; Divisor
+
+    ; Display the result 
+    MOV A, 31H ; High byte
+    LCALL WRITE_HEX      
+    MOV A, 30H ; Low byte
+    LCALL WRITE_HEX
+
+    MOV A, #' '
+    LCALL WRITE_DATA
+    MOV A, 35H ; Remainder high byte
+    LCALL WRITE_HEX
+    MOV A, 34H ; Remainder low byte
+    LCALL WRITE_HEX
+
+    MOV A, #'/'
+    LCALL WRITE_DATA
+    MOV A, 37H ; Divisor low byte
+    LCALL WRITE_HEX
+    MOV A, 36H ; Divisor high byte
+    LCALL WRITE_HEX
+
+    LJMP NEXT_OP
 
 WRONG_OP: ; Wrong operation key
     LJMP MAIN_LOOP
