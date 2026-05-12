@@ -85,6 +85,76 @@ ADD_FUNC: ; Addition Function "A"
     LJMP NEXT_OP
     
 SUB_FUNC: ; Substraction Function "B"
+    MOV A, #'-'
+    LCALL WRITE_DATA
+
+    MOV R0, #30H 
+    LCALL GET_NUM ; Get the second number   
+    MOV R0, #30H
+    LCALL BCD_HEX
+
+    MOV A, #'='
+    LCALL WRITE_DATA
+
+    POP 33H ; First num low byte <- [STACK]
+    POP 32H ; First num high byte <- [STACK]
+
+    ; Subtract the low bytes
+    MOV A, 33H
+    CLR C ; Clear carry for subtraction
+    SUBB A, 30H
+    MOV 30H, A
+
+    ; Subtract the high bytes with borrow from the low byte subtraction
+    MOV A, 32H
+    SUBB A, 31H
+    MOV 31H, A
+
+    JNC SUB_POS ; If no borrow, the result is positive or zero
+
+    ; Negative result handling
+    MOV A, 30H
+    CPL A
+    MOV 30H, A ; Invert the low byte
+    MOV A, 31H
+    CPL A
+    MOV 31H, A ; Invert the high byte
+
+    INC 30H ; +1 on low byte
+    JNZ SUB_MAG_OK ; If low byte is not zero after increment, skip the carry
+    INC 31H ; propagate carry to high byte if low byte was zero
+
+SUB_MAG_OK:
+
+    MOV R0, #30H
+    LCALL HEX_BCD ; Convert the magnitude of the result to BCD
+
+    MOV A, #'-'
+    LCALL WRITE_DATA ; Display the negative sign
+
+    MOV A, 32H 
+    ANL A, #0FH ; Keep only the lowest BCD digit
+    ADD A, #'0'
+    LCALL WRITE_DATA
+
+    MOV A, 31H
+    LCALL WRITE_HEX
+    MOV A, 30H
+    LCALL WRITE_HEX
+
+    LJMP NEXT_OP
+
+SUB_POS: ; Positive or '0' result from subtraction
+    ; Convert the result back to BCD
+    MOV R0, #30H        
+    LCALL HEX_BCD        
+    
+    ; Display the result
+    MOV A, 31H ; High byte
+    LCALL WRITE_HEX      
+    MOV A, 30H ; Low byte
+    LCALL WRITE_HEX
+
     LJMP NEXT_OP
 
 MUL_FUNC: ; Multiplication Function "C"
