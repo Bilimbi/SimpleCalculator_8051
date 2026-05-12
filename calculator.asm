@@ -85,7 +85,7 @@ ADD_FUNC: ; Addition Function "A"
     LJMP NEXT_OP
     
 SUB_FUNC: ; Substraction Function "B"
-    LJMP STOP
+    LJMP NEXT_OP
 
 MUL_FUNC: ; Multiplication Function "C"
     MOV A, #'*'
@@ -162,7 +162,7 @@ DIV_FUNC: ; Division Function "D"
     MOV R0, #34H
     LCALL HEX_BCD ; Remainder
     MOV R0, #36H
-    LCALL HEX_BCD ; Divisor
+    LCALL HEX_BCD ; Divisor (the second number)
 
     ; Display the result 
     MOV A, 31H ; High byte
@@ -177,14 +177,7 @@ DIV_FUNC: ; Division Function "D"
     MOV A, 34H ; Remainder low byte
     LCALL WRITE_HEX
 
-    MOV A, #'/'
-    LCALL WRITE_DATA
-    MOV A, 37H ; Divisor low byte
-    LCALL WRITE_HEX
-    MOV A, 36H ; Divisor high byte
-    LCALL WRITE_HEX
-
-    LJMP NEXT_OP
+    SJMP NEXT_OP
 
 WRONG_OP: ; Wrong operation key
     LJMP MAIN_LOOP

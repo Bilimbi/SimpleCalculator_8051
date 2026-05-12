@@ -34,7 +34,7 @@
     34  012C: B4 0D 03      CJNE A, #13, CHECK_DIV_NOT
     35  012F: 02 01 AC      LJMP DIV_FUNC
     36  0132:           CHECK_DIV_NOT:
-    37  0132: 02 02 14      LJMP WRONG_OP
+    37  0132: 02 02 04      LJMP WRONG_OP
     38                  
     39                  ; --------------------------------------------------
     40                  ; \/ Operations \/
@@ -82,10 +82,10 @@
     82  0168: E5 30         MOV A, 30H ; Low byte
     83  016A: 12 81 04      LCALL WRITE_HEX
     84                  
-    85  016D: 02 02 17      LJMP NEXT_OP
+    85  016D: 02 02 07      LJMP NEXT_OP
     86                      
     87  0170:           SUB_FUNC: ; Substraction Function "B"
-    88  0170: 02 02 1D      LJMP STOP
+    88  0170: 02 02 07      LJMP NEXT_OP
     89                  
     90  0173:           MUL_FUNC: ; Multiplication Function "C"
     91  0173: 74 2A         MOV A, #'*'
@@ -122,7 +122,7 @@
    122  01A4: E5 30         MOV A, 30H
    123  01A6: 12 81 04      LCALL WRITE_HEX
    124                  
-   125  01A9: 02 02 17      LJMP NEXT_OP
+   125  01A9: 02 02 07      LJMP NEXT_OP
    126                  
    127  01AC:           DIV_FUNC: ; Division Function "D"
    128  01AC: 74 2F         MOV A, #'/'
@@ -162,7 +162,7 @@
    162  01DF: 78 34         MOV R0, #34H
    163  01E1: 12 81 22      LCALL HEX_BCD ; Remainder
    164  01E4: 78 36         MOV R0, #36H
-   165  01E6: 12 81 22      LCALL HEX_BCD ; Divisor
+   165  01E6: 12 81 22      LCALL HEX_BCD ; Divisor (the second number)
    166                  
    167                      ; Display the result 
    168  01E9: E5 31         MOV A, 31H ; High byte
@@ -177,21 +177,14 @@
    177  01FD: E5 34         MOV A, 34H ; Remainder low byte
    178  01FF: 12 81 04      LCALL WRITE_HEX
    179                  
-   180  0202: 74 2F         MOV A, #'/'
-   181  0204: 12 81 02      LCALL WRITE_DATA
-   182  0207: E5 37         MOV A, 37H ; Divisor low byte
-   183  0209: 12 81 04      LCALL WRITE_HEX
-   184  020C: E5 36         MOV A, 36H ; Divisor high byte
-   185  020E: 12 81 04      LCALL WRITE_HEX
-   186                  
-   187  0211: 02 02 17      LJMP NEXT_OP
+   180  0202: 80 03         SJMP NEXT_OP
+   181                  
+   182  0204:           WRONG_OP: ; Wrong operation key
+   183  0204: 02 01 03      LJMP MAIN_LOOP
+   184                  
+   185  0207:           NEXT_OP:
+   186  0207: 12 81 1A      LCALL WAIT_ENT_ESC ; Wait for the user to press "Enter" or "Escape"
+   187  020A: 02 01 03      LJMP MAIN_LOOP
    188                  
-   189  0214:           WRONG_OP: ; Wrong operation key
-   190  0214: 02 01 03      LJMP MAIN_LOOP
-   191                  
-   192  0217:           NEXT_OP:
-   193  0217: 12 81 1A      LCALL WAIT_ENT_ESC ; Wait for the user to press "Enter" or "Escape"
-   194  021A: 02 01 03      LJMP MAIN_LOOP
-   195                  
-   196  021D:           STOP:
-   197  021D: 80 FE         SJMP $ ; Stopping the program
+   189  020D:           STOP:
+   190  020D: 80 FE         SJMP $ ; Stopping the program
