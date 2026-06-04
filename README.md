@@ -1,5 +1,5 @@
 # SimpleCalculator_8051
-A simple calculator program written in assembly for the Intel 8051 microprocessors. A project for the University.
+A simple calculator program written in Assembly for the Intel 8051 microcontroller. A university project.
 
 # How to use:
 This calculator can add, subtract, multiply and divide 4-digit decimal numbers. You need an Intel 8051 microcontroller or a emulator program (DSM-51 or similar) to use the .hex file.
